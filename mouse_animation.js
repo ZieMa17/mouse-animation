@@ -208,9 +208,7 @@ if (loop == null) { loop = false; }	this.initialize(mode,startPosition,loop,{});
 			video.setAttribute('style', 'position:absolute;pointer-events:none;width:100%;');
 			video.autoplay = true;
 			video.controls = false;
-			video.src = `video / scene - ${
-				this.nextFrame
-			}.mp4`;
+			video.src = `video/scene-${this.nextFrame}.mp4`;
 			video.addEventListener('play', () => {
 				createjs.Sound.stop();
 			});
