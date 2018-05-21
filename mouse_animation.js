@@ -173,120 +173,125 @@ if (loop == null) { loop = false; }	this.initialize(mode,startPosition,loop,{});
 
 	// timeline functions:
 	this.frame_0 = function() {
-		this.stop();
-		this.isAnimationPlaying = false;
-		this.nextFrame = 1;
-		this.mazeContext = null;
-		this.isGhostMode = false;
-		this.handleMouse = function (e) {
-			if (e.nativeEvent.buttons === 1) {
-				this.mouse.hasReachedTarget = false;
-				this.target.x = e.localX;
-				this.target.y = e.localY;
-			}
-		};
-		this.containsWall = function (x, y, width, height) {
-			if (this.mazeContext === null || this.isGhostMode) {
-				return false; // ignore first screen and cheat code
-			}
-		
-			const imgData = this.mazeContext.getImageData(x - width / 2, y - height / 2, width, height);
-			const data = imgData.data;
-			// check colors in given position
-			for (let i = 0; i < data.length; i += 4) {
-				if (data[i] !== 32 && data[i + 1] !== 41 && data[i + 2] !== 50) {
-					return true;
-				}
-			}
-		
-			return false;
-		};
-		this.playNextScene = function () {
-			this.isAnimationPlaying = true;
-		
-			const video = document.createElement('video');
-			video.setAttribute('style', 'position:absolute;pointer-events:none;width:100%;');
-			video.autoplay = true;
-			video.controls = false;
-			video.src = `video/scene-${this.nextFrame}.mp4`;
-			video.addEventListener('play', () => {
-				createjs.Sound.stop();
-			});
-			video.addEventListener('pause', () => {
-				this.stage.canvas.parentElement.removeChild(video);
-				this.gotoAndStop(this.nextFrame);
-			});
-			this.stage.canvas.parentElement.appendChild(video);
-		};
-		
-		const cheeseBounds = this.cheese.getBounds();
-		this.cheese.width = cheeseBounds.width;
-		this.cheese.height = cheeseBounds.height;
-		this.cheese.wasReachedBy = function (object) {
-			return object.x + object.width > this.x &&
-				object.x < this.x + this.width &&
-				object.y + object.height > this.y &&
-				object.y < this.y + this.height;
-		};
-		
-		const mouseBounds = this.mouse.getBounds();
-		this.mouse.width = mouseBounds.width;
-		this.mouse.height = mouseBounds.height;
-		this.mouse.speed = 0.05;
-		this.mouse.hasReachedTarget = false;
-		this.mouse.rotateTowards = function (object) {
-			this.rotation = Math.atan2(
-				object.y - this.y,
-				object.x - this.x,
-			) * 180 / Math.PI;
-		};
-		this.mouse.chase = function (object) {
-			if (this.hasReachedTarget) {
-				return;
-			}
-		
-			const xDiff = object.x - this.x;
-			const yDiff = object.y - this.y;
-			if (Math.abs(xDiff) < 1 && Math.abs(yDiff) < 1) {
-				this.hasReachedTarget = true;
-				return;
-			}
-		
-			this.rotateTowards(object);
-		
-			const newX = this.x + xDiff * this.speed;
-			const newY = this.y + yDiff * this.speed;
-		
-			const bounds = this.getTransformedBounds();
-			if (this.parent.containsWall(newX, newY, bounds.width / 2, bounds.height / 2)) {
-				this.hasReachedTarget = true;
-				return;
-			}
-		
-			this.x = newX;
-			this.y = newY;
-		};
-		
-		this.stage.addEventListener('stagemousemove', e => this.handleMouse(e));
-		this.stage.addEventListener('stagemousedown', e => this.handleMouse(e));
-		document.addEventListener('keypress', e => {
-			if (e.keyCode === 103) {
-				this.isGhostMode = !this.isGhostMode;
-				console.log('Cheat: ghost mode - ' + (this.isGhostMode ? 'enabled' : 'disabled'));
-			}
-		});
-		
-		createjs.Ticker.addEventListener('tick', () => {
-			if (this.isAnimationPlaying) {
-				return;
-			}
-		
-			this.mouse.chase(this.target);
-			if (this.cheese.wasReachedBy(this.mouse)) {
-				this.playNextScene();
-			}
-		});
-		playSound("maze",-1);
+	    this.stop();
+	    this.isAnimationPlaying = false;
+	    this.nextFrame = 1;
+	    this.mazeContext = null;
+	    this.isGhostMode = false;
+	    this.handleMouse = function(e) {
+	        if (e.nativeEvent.buttons === 1) {
+	            this.mouse.hasReachedTarget = false;
+	            this.target.x = e.localX;
+	            this.target.y = e.localY;
+	        }
+	    };
+	    this.containsWall = function(x, y, width, height) {
+	        if (this.mazeContext === null || this.isGhostMode) {
+	            return false; // ignore first screen and cheat code
+	        }
+
+	        const imgData = this.mazeContext.getImageData(x - width / 2, y - height / 2, width, height);
+	        const data = imgData.data;
+	        // check colors in given position
+	        for (let i = 0; i < data.length; i += 4) {
+	            if (data[i] !== 32 && data[i + 1] !== 41 && data[i + 2] !== 50) {
+	                return true;
+	            }
+	        }
+
+	        return false;
+	    };
+	    this.playNextScene = function() {
+	        this.isAnimationPlaying = true;
+
+	        this.video[this.nextFrame].addEventListener('pause', () => {
+	            this.stage.canvas.parentElement.removeChild(this.video[this.nextFrame]);
+	            this.gotoAndStop(this.nextFrame);
+	        });
+	        this.video[this.nextFrame].style.display = 'block';
+	        this.video[this.nextFrame].play();
+	    };
+
+	    const cheeseBounds = this.cheese.getBounds();
+	    this.cheese.width = cheeseBounds.width;
+	    this.cheese.height = cheeseBounds.height;
+	    this.cheese.wasReachedBy = function(object) {
+	        return object.x + object.width > this.x &&
+	            object.x < this.x + this.width &&
+	            object.y + object.height > this.y &&
+	            object.y < this.y + this.height;
+	    };
+
+	    const mouseBounds = this.mouse.getBounds();
+	    this.mouse.width = mouseBounds.width;
+	    this.mouse.height = mouseBounds.height;
+	    this.mouse.speed = 0.05;
+	    this.mouse.hasReachedTarget = false;
+	    this.mouse.rotateTowards = function(object) {
+	        this.rotation = Math.atan2(
+	            object.y - this.y,
+	            object.x - this.x,
+	        ) * 180 / Math.PI;
+	    };
+	    this.mouse.chase = function(object) {
+	        if (this.hasReachedTarget) {
+	            return;
+	        }
+
+	        const xDiff = object.x - this.x;
+	        const yDiff = object.y - this.y;
+	        if (Math.abs(xDiff) < 1 && Math.abs(yDiff) < 1) {
+	            this.hasReachedTarget = true;
+	            return;
+	        }
+
+	        this.rotateTowards(object);
+
+	        const newX = this.x + xDiff * this.speed;
+	        const newY = this.y + yDiff * this.speed;
+
+	        const bounds = this.getTransformedBounds();
+	        if (this.parent.containsWall(newX, newY, bounds.width / 2, bounds.height / 2)) {
+	            this.hasReachedTarget = true;
+	            return;
+	        }
+
+	        this.x = newX;
+	        this.y = newY;
+	    };
+
+	    this.video = [];
+	    for (let i = 1; i <= 4; i++) {
+	        this.video[i] = document.createElement('video');
+	        this.video[i].setAttribute('style', 'position:absolute;pointer-events:none;width:100%;display:none;');
+	        this.video[i].controls = false;
+	        this.video[i].src = `video/scene-${i}.mp4`;
+	        this.video[i].addEventListener('play', () => {
+	            createjs.Sound.stop();
+	        });
+	        this.stage.canvas.parentElement.appendChild(this.video[i]);
+	    }
+
+	    this.stage.addEventListener('stagemousemove', e => this.handleMouse(e));
+	    this.stage.addEventListener('stagemousedown', e => this.handleMouse(e));
+	    document.addEventListener('keypress', e => {
+	        if (e.keyCode === 103) {
+	            this.isGhostMode = !this.isGhostMode;
+	            console.log('Cheat: ghost mode - ' + (this.isGhostMode ? 'enabled' : 'disabled'));
+	        }
+	    });
+
+	    createjs.Ticker.addEventListener('tick', () => {
+	        if (this.isAnimationPlaying) {
+	            return;
+	        }
+
+	        this.mouse.chase(this.target);
+	        if (this.cheese.wasReachedBy(this.mouse)) {
+	            this.playNextScene();
+	        }
+	    });
+	    playSound("maze", -1);
 	}
 	this.frame_1 = function() {
 		this.instance_1.cache(0, 0, 1920, 1080);
