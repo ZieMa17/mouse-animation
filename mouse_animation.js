@@ -304,7 +304,7 @@ if (loop == null) { loop = false; }	this.initialize(mode,startPosition,loop,{});
 			this.mouse.width = this.mouse.height = size;
 		}, 100);
 		
-		playSound("maze");
+		playSound("maze", -1);
 	}
 	this.frame_2 = function() {
 		this.instance_2.cache(0, 0, 1920, 1080);
@@ -322,7 +322,7 @@ if (loop == null) { loop = false; }	this.initialize(mode,startPosition,loop,{});
 			this.mouse.width = this.mouse.height = size;
 		}, 100);
 		
-		playSound("maze");
+		playSound("maze", -1);
 	}
 	this.frame_3 = function() {
 		this.instance_3.cache(0, 0, 1920, 1080);
@@ -340,7 +340,7 @@ if (loop == null) { loop = false; }	this.initialize(mode,startPosition,loop,{});
 			this.mouse.width = this.mouse.height = size;
 		}, 100);
 		
-		playSound("maze");
+		playSound("maze", -1);
 	}
 
 	// actions tween:
