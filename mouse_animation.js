@@ -1,70 +1,9 @@
 (function (lib, img, cjs, ss, an) {
 
 var p; // shortcut to reference prototypes
-lib.webFontTxtInst = {}; 
-var loadedTypekitCount = 0;
-var loadedGoogleCount = 0;
-var gFontsUpdateCacheList = [];
-var tFontsUpdateCacheList = [];
 lib.ssMetadata = [];
 
 
-
-lib.updateListCache = function (cacheList) {		
-	for(var i = 0; i < cacheList.length; i++) {		
-		if(cacheList[i].cacheCanvas)		
-			cacheList[i].updateCache();		
-	}		
-};		
-
-lib.addElementsToCache = function (textInst, cacheList) {		
-	var cur = textInst;		
-	while(cur != exportRoot) {		
-		if(cacheList.indexOf(cur) != -1)		
-			break;		
-		cur = cur.parent;		
-	}		
-	if(cur != exportRoot) {		
-		var cur2 = textInst;		
-		var index = cacheList.indexOf(cur);		
-		while(cur2 != cur) {		
-			cacheList.splice(index, 0, cur2);		
-			cur2 = cur2.parent;		
-			index++;		
-		}		
-	}		
-	else {		
-		cur = textInst;		
-		while(cur != exportRoot) {		
-			cacheList.push(cur);		
-			cur = cur.parent;		
-		}		
-	}		
-};		
-
-lib.gfontAvailable = function(family, totalGoogleCount) {		
-	lib.properties.webfonts[family] = true;		
-	var txtInst = lib.webFontTxtInst && lib.webFontTxtInst[family] || [];		
-	for(var f = 0; f < txtInst.length; ++f)		
-		lib.addElementsToCache(txtInst[f], gFontsUpdateCacheList);		
-
-	loadedGoogleCount++;		
-	if(loadedGoogleCount == totalGoogleCount) {		
-		lib.updateListCache(gFontsUpdateCacheList);		
-	}		
-};		
-
-lib.tfontAvailable = function(family, totalTypekitCount) {		
-	lib.properties.webfonts[family] = true;		
-	var txtInst = lib.webFontTxtInst && lib.webFontTxtInst[family] || [];		
-	for(var f = 0; f < txtInst.length; ++f)		
-		lib.addElementsToCache(txtInst[f], tFontsUpdateCacheList);		
-
-	loadedTypekitCount++;		
-	if(loadedTypekitCount == totalTypekitCount) {		
-		lib.updateListCache(tFontsUpdateCacheList);		
-	}		
-};
 // symbols:
 
 
@@ -75,8 +14,8 @@ lib.tfontAvailable = function(family, totalTypekitCount) {
 p.nominalBounds = new cjs.Rectangle(0,0,387,276);
 
 
-(lib.intro = function() {
-	this.initialize(img.intro);
+(lib.introwithShortcut = function() {
+	this.initialize(img.introwithShortcut);
 }).prototype = p = new cjs.Bitmap();
 p.nominalBounds = new cjs.Rectangle(0,0,1920,1080);
 
@@ -141,6 +80,21 @@ function getMCSymbolPrototype(symbol, nominalBounds, frameBounds) {
 p.nominalBounds = new cjs.Rectangle(-84.5,-73.5,169,147);
 
 
+(lib.shortcut = function(mode,startPosition,loop) {
+	this.initialize(mode,startPosition,loop,{});
+
+	// Layer 1
+	this.shape = new cjs.Shape();
+	this.shape.graphics.f().s("#000000").ss(1,1,1).p("Eha7gC2MC13AAAIAAFtMi13AAAg");
+
+	this.shape_1 = new cjs.Shape();
+	this.shape_1.graphics.f("#D7D16E").s().p("Eha7AC3IAAltMC13AAAIAAFtg");
+
+	this.timeline.addTween(cjs.Tween.get({}).to({state:[{t:this.shape_1},{t:this.shape}]}).wait(1));
+
+}).prototype = getMCSymbolPrototype(lib.shortcut, new cjs.Rectangle(-583,-19.3,1166,38.7), null);
+
+
 (lib.mouse_1 = function(mode,startPosition,loop) {
 	this.initialize(mode,startPosition,loop,{});
 
@@ -201,32 +155,34 @@ if (loop == null) { loop = false; }	this.initialize(mode,startPosition,loop,{});
 		
 			return false;
 		};
-		this.playNextScene = function () {
+		this.playNextScene = function() {
 			this.isAnimationPlaying = true;
 		
-			const video = document.createElement('video');
-			video.setAttribute('style', 'position:absolute;pointer-events:none;width:100%;');
-			video.autoplay = true;
-			video.controls = false;
-			video.src = `video/scene-${this.nextFrame}.mp4`;
-			video.addEventListener('play', () => {
-				createjs.Sound.stop();
-			});
-			video.addEventListener('pause', () => {
-				this.stage.canvas.parentElement.removeChild(video);
+			this.video[this.nextFrame].addEventListener('pause', () => {
+				this.stage.canvas.parentElement.removeChild(this.video[this.nextFrame]);
 				this.gotoAndStop(this.nextFrame);
 			});
-			this.stage.canvas.parentElement.appendChild(video);
+			this.video[this.nextFrame].style.display = 'block';
+			this.video[this.nextFrame].play();
 		};
 		
 		const cheeseBounds = this.cheese.getBounds();
 		this.cheese.width = cheeseBounds.width;
 		this.cheese.height = cheeseBounds.height;
 		this.cheese.wasReachedBy = function (object) {
-			return object.x + object.width > this.x &&
-				object.x < this.x + this.width &&
-				object.y + object.height > this.y &&
-				object.y < this.y + this.height;
+			return object.x + object.width/2 > this.x - this.width/2 &&
+				object.x - object.width/2 < this.x + this.width/2 &&
+				object.y + object.height/2 > this.y - this.height/2 &&
+				object.y - object.height/2 < this.y + this.height/2;
+		};
+		
+		this.shortcut.width = 1150;
+		this.shortcut.height = 40;
+		this.shortcut.wasReachedBy = function (object) {
+			return object.x + object.width/2 > this.x - this.width/2 &&
+				object.x - object.width/2 < this.x + this.width/2 &&
+				object.y + object.height/2 > this.y - this.height/2 &&
+				object.y - object.height/2 < this.y + this.height/2;
 		};
 		
 		const mouseBounds = this.mouse.getBounds();
@@ -267,6 +223,18 @@ if (loop == null) { loop = false; }	this.initialize(mode,startPosition,loop,{});
 			this.y = newY;
 		};
 		
+		this.video = [];
+		for (let i = 1; i <= 5 ; i++) {
+			this.video[i] = document.createElement('video');
+			this.video[i].setAttribute('style', 'position:absolute;pointer-events:none;width:100%;display:none;');
+			this.video[i].controls = false;
+			this.video[i].src = `video/scene-${i}.mp4`;
+			this.video[i].addEventListener('play', () => {
+				createjs.Sound.stop();
+			});
+			this.stage.canvas.parentElement.appendChild(this.video[i]);
+		}
+		
 		this.stage.addEventListener('stagemousemove', e => this.handleMouse(e));
 		this.stage.addEventListener('stagemousedown', e => this.handleMouse(e));
 		document.addEventListener('keypress', e => {
@@ -282,6 +250,10 @@ if (loop == null) { loop = false; }	this.initialize(mode,startPosition,loop,{});
 			}
 		
 			this.mouse.chase(this.target);
+			if (this.shortcut.wasReachedBy(this.mouse) && this.nextFrame == 1) {
+				this.nextFrame = 5;
+				this.playNextScene();
+			}
 			if (this.cheese.wasReachedBy(this.mouse)) {
 				this.playNextScene();
 			}
@@ -368,7 +340,7 @@ if (loop == null) { loop = false; }	this.initialize(mode,startPosition,loop,{});
 	this.timeline.addTween(cjs.Tween.get(this.cheese).wait(1).to({regX:0,regY:0,scaleX:0.34,scaleY:0.34,rotation:0,x:1587.5,y:328.3},0).wait(1).to({scaleX:0.26,scaleY:0.26,x:1810.2,y:79.6},0).wait(1).to({scaleX:0.2,scaleY:0.2,x:1849.4,y:269.6},0).to({_off:true},1).wait(1));
 
 	// background
-	this.instance = new lib.intro();
+	this.instance = new lib.introwithShortcut();
 	this.instance.parent = this;
 
 	this.instance_1 = new lib.maze1();
@@ -390,6 +362,13 @@ if (loop == null) { loop = false; }	this.initialize(mode,startPosition,loop,{});
 
 	this.timeline.addTween(cjs.Tween.get({}).to({state:[{t:this.instance}]}).to({state:[{t:this.instance_1}]},1).to({state:[{t:this.instance_2}]},1).to({state:[{t:this.instance_3}]},1).to({state:[{t:this.shape_1},{t:this.shape}]},1).wait(1));
 
+	// shortcut
+	this.shortcut = new lib.shortcut();
+	this.shortcut.parent = this;
+	this.shortcut.setTransform(721.5,1024.6);
+
+	this.timeline.addTween(cjs.Tween.get(this.shortcut).to({_off:true},1).wait(4));
+
 }).prototype = p = new cjs.MovieClip();
 p.nominalBounds = new cjs.Rectangle(960,540,1920,1080);
 // library properties:
@@ -399,16 +378,15 @@ lib.properties = {
 	fps: 24,
 	color: "#666666",
 	opacity: 1.00,
-	webfonts: {},
 	manifest: [
-		{src:"images/cheese.png", id:"cheese"},
-		{src:"images/intro.jpg", id:"intro"},
-		{src:"images/maze1.jpg", id:"maze1"},
-		{src:"images/maze2.jpg", id:"maze2"},
-		{src:"images/maze3.jpg", id:"maze3"},
-		{src:"images/mouse.png", id:"mouse"},
-		{src:"images/star.png", id:"star"},
-		{src:"sounds/maze.mp3", id:"maze"}
+		{src:"images/cheese.png?1527415130611", id:"cheese"},
+		{src:"images/introwithShortcut.jpg?1527415130611", id:"introwithShortcut"},
+		{src:"images/maze1.jpg?1527415130611", id:"maze1"},
+		{src:"images/maze2.jpg?1527415130611", id:"maze2"},
+		{src:"images/maze3.jpg?1527415130611", id:"maze3"},
+		{src:"images/mouse.png?1527415130611", id:"mouse"},
+		{src:"images/star.png?1527415130611", id:"star"},
+		{src:"sounds/maze.mp3?1527415130611", id:"maze"}
 	],
 	preloads: []
 };
